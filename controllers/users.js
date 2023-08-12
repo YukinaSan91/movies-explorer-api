@@ -3,7 +3,12 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { STATUS_OK } = require('../utils/constants');
+const {
+  STATUS_OK,
+  USER_NOT_FOUND,
+  INCORRECT_DATA_ERROR,
+  USER_EMAIL_EXIST,
+} = require('../utils/constants');
 
 const ValidationError = require('../errors/ValidationError');
 const ConflictError = require('../errors/ConflictError');
@@ -29,7 +34,7 @@ module.exports.getUserById = (req, res, next) => {
     .findById(_id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        throw new NotFoundError(USER_NOT_FOUND);
       }
       res.send(user);
     })
@@ -61,10 +66,10 @@ module.exports.createUser = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new ValidationError('Переданы некорректные данные'));
+        return next(new ValidationError(INCORRECT_DATA_ERROR));
       }
       if (err.code === 11000) {
-        return next(new ConflictError('Пользователь с такой почтой уже существует'));
+        return next(new ConflictError(USER_EMAIL_EXIST));
       }
       return next(err);
     });
@@ -78,14 +83,14 @@ module.exports.updateUser = (req, res, next) => {
     // eslint-disable-next-line consistent-return
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Запрашиваемый пользователь не найден');
+        throw new NotFoundError(USER_NOT_FOUND);
       }
       res.send(user);
     })
     // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new ValidationError('Переданы некорректные данные'));
+        return next(new ValidationError(INCORRECT_DATA_ERROR));
       }
       return next(err);
     });
