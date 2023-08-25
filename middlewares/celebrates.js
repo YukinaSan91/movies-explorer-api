@@ -45,7 +45,6 @@ module.exports.deleteMovie = celebrate({
       .string()
       .required()
       .alphanum()
-      .hex()
-      .length(24),
+      .hex(),
   }),
 });
